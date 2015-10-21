@@ -1,0 +1,12 @@
+
+.clear{
+	clear:both;
+}
+#navigation{
+	margin:0 auto;
+	position:relative;
+	left:36%;
+}
+#content table tr:first-child td {
+	font-weight:bold;
+}
