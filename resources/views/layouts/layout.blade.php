@@ -16,8 +16,9 @@
  </head>
  <body>
  	@include('home/_nav');
+
 	 <div class="container">
-	 	
+	 	@include('alerts/messages')
 	 	<div id="content">
 
   			 <div class="container">

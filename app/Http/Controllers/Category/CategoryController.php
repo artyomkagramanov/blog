@@ -4,12 +4,22 @@ namespace App\Http\Controllers\Category;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Http\Requests\CategoryRequest;
 use App\Http\Controllers\Controller;
-use App\Model;
+use App\Contracts\CategoryInterface;
+
 
 
 class CategoryController extends Controller
 {
+    protected $category;
+    
+
+    public function __construct(CategoryInterface $category)
+    {
+        $this->category = $category;
+       
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,8 +27,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-       $users = App\Model\Category::getall();
-       return view('categories.index',$users); //
+
+        return view('categories.index',['categories'=>$this->category->getAll(),'title' => 'Categories']);
     }
 
     /**
@@ -28,7 +38,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+
+         return view('categories.form',['title'=>"Create Category"]);
     }
 
     /**
@@ -37,9 +48,19 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
         //
+
+        if($this->category->create($request->all()))
+        {
+            return redirect('/category')->with('status', 'Category Added');
+        }
+        else
+        {
+            return redirect('/category/')->with('status', 'Unknown error!');
+        }
+
     }
 
     /**
@@ -51,6 +72,8 @@ class CategoryController extends Controller
     public function show($id)
     {
         //
+        $category = $this->category->show($id);
+        return view('categories.show',['category'=>$category,'title' => $category->name]);
     }
 
     /**
@@ -60,8 +83,10 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
+    {   
+
+        $category = $this->category->show($id);
+        return view('categories.form',['title'=>"Edit Category",'id'=>$id,'category' => $category]);
     }
 
     /**
@@ -71,9 +96,17 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         //
+        if($this->category->update($request->all(),$id))
+        {
+            return redirect('/category')->with('status', 'Category Edited');
+        }
+        else
+        {
+            return redirect('/category/')->with('status', 'Unknown error!');
+        }
     }
 
     /**
@@ -84,6 +117,13 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if($this->category->delete($id))
+        {
+            return redirect('/category')->with('status', 'Category Deleted');
+        }
+        else
+        {
+            return redirect('/category/'.$id)->with('status', 'Unknown error!');
+        }
     }
 }

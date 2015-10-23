@@ -1,27 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Post;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Contracts\PostInterface;
+use App\Contracts\CategoryInterface;
 
-class HomeController extends Controller
+class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct()
-    {
-        $this->middleware('auth', ['except' => 'getLogout']);
-    }
+    protected $post;
+    protected $category;
 
+    public function __construct(PostInterface $post,CategoryInterface $category)
+    {
+        $this->post=$post;
+        $this->category=$category;
+    }
 
     public function index()
     {
-        return view('home.index');
+        return view('posts.index',['posts'=>$this->post->getAll(),'title' => 'Posts']);
     }
 
     /**
@@ -31,7 +36,7 @@ class HomeController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.form',['title' => 'Create New Post','categories' => $this->category->getAll()]);
     }
 
     /**
@@ -43,6 +48,15 @@ class HomeController extends Controller
     public function store(Request $request)
     {
         //
+        //dd($request->file('post_image'));
+        if($this->post->create($request))
+        {
+            return redirect('/post')->with('status', 'Post Added');
+        }
+        else
+        {
+            return redirect('/post/')->with('status', 'Unknown error!');
+        }
     }
 
     /**

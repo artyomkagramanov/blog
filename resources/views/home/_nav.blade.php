@@ -5,10 +5,10 @@
 	</div>
 		<ul class="pull-left nav navbar-nav">
 			<li>
-				<a href="{!!url('/posts')!!}">Posts <span class="sr-only">(current)</span></a>
+				<a href="{!!url('/post')!!}">Posts <span class="sr-only">(current)</span></a>
 			</li>
 			<li>
-				<a href="{!!url('/categories')!!}">Categories</a>
+				<a href="{!!url('/category')!!}">Categories</a>
 			</li>
 			<li>
 				<a href="{!!url('/about')!!}">About</a>

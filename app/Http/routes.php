@@ -32,4 +32,18 @@ Route::post('password/email', 'Auth\PasswordController@postEmail');
 Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
 Route::post('password/reset', 'Auth\PasswordController@postReset');
 
-Route::get('/posts', 'Category\CategoryController@index');
+// Categories root
+
+//Route::get('/categories', 'Category\CategoryController@index');
+//Route::get('/category/{id}', 'Category\CategoryController@show');
+//Route::get('/category/{id}/edit', 'Category\CategoryController@edit');
+//Route::get('/category/{id}/destroy', 'Category\CategoryController@destroy');
+
+//Posts root
+
+
+
+
+Route::resource('category', 'Category\CategoryController');
+
+Route::resource('post', 'Post\PostController');
