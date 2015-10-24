@@ -27,7 +27,8 @@ class CategoryService implements CategoryInterface
 
 	public function delete($id)
 	{
-		return $this->category
+		$this->category->find($id)->posts()->detach();
+		 return $this->category
 			->where('id', '=', $id)
 			->where('user_id',$this->user->id())
 			->delete();

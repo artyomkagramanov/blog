@@ -8,5 +8,5 @@ interface PostInterface{
 	public function show($id);
 	public function delete($id);
 	public function create($request);
-	public function update($inputs,$id);
+	public function update($request,$id);
 }

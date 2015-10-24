@@ -4,8 +4,8 @@
 @stop
 @section('content')
 <div style="width:200px;margin:0 auto;">    
-    @if(isset($category))
-    {!! Form::model($category,array('url' => '/post/'.$id, 'method' => 'PUT','files' => true)) !!}
+    @if(isset($post))
+    {!! Form::model($post,array('url' => '/post/'.$id, 'method' => 'PUT','files' => true)) !!}
     @else
     {!! Form::open(array('url' => '/post/', 'method' => 'POST','files' => true)) !!}
     @endif
@@ -22,12 +22,21 @@
             {!! Form::file('post_image', null, array('required', 'class'=>'form-control')) !!}
         </div>
         <div class="form-group">
-            @foreach($categories as $category)
+            @if(isset($post))
+            
+                @foreach($categories as $category)
+                    {!! Form::label($category->name) !!}
+                    {!! Form::checkbox('category_'.$category->id, $category->id, in_array( $category->id , $post->categories->lists('id')->toArray())) !!}
+                @endforeach
+            
+            @else
 
-                {!! Form::label($category->name) !!}
-                {!! Form::checkbox('category_'.$category->id, $category->id) !!}
-
-            @endforeach
+                @foreach($categories as $category)
+                    {!! Form::label($category->name) !!}
+                    {!! Form::checkbox('category_'.$category->id, $category->id) !!}
+                @endforeach
+                
+            @endif
 
         </div>
         <div class="form-group">

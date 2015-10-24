@@ -9,25 +9,42 @@
 		{{$title}}
 		<a class="btn btn-default" href="{{url('/post/create')}}" role="button">Add New Post</a>
 	</div>
-	  <div style="max-width:1100px;margin:0 auto;">
-			<div style="margin:0 auto;max-width:980px;">
-			@foreach($posts as $post)
-				<article style="float:left;max-width:300px; border:1px solid gray; margin:20px 10px 0 0; overflow:hidden;border-radius:10px;">
-					<h2 style="text-align:center;">{{$post->title}}</h2>
-					<img src="{!!url('/images/'.$post->image)!!}" style="width:100px; height:140px;float:left; margin-right:10px;"/>
-					{{$post->description}}
-					@foreach($post->categories as $category)
-						<div>
-							{{{$category->name}}}
-						</div>
-					@endforeach
-				</article>
-				
-				 
-			@endforeach
-		</div>
-			<div style="clear:both;"></div>
+	  <div style="max-width:1100px;margin:0 auto; padding-top:20px;">
+	  	@foreach($posts as $post)	
+	  		<div class="col-xs-12 col-sm-6 col-md-3">
+            	<div class="thumbnail">
+	                <img src="{!!url('/images/'.$post->image)!!}" alt="">
+	                <div class="caption">
+	                    <h4 class="text-center">{{$post->title}}</h4>
+	                    <p>
+	                        {{$post->description}}
+	                    </p>
+	                    <p class="text-center">
+	                        
+	                        <a href="{{url('/post/'.$post->id.'/edit')}}" class="btn btn-info" role="button" style="display:block; float:left;">Edit</a>
+	                        <div onclick="return confirm('Are you sure')" style="display:block; float:left;margin-left:10px;">						
+							    {!! Form::open(array('url' => '/post/'.$post->id, 'method' => 'DELETE')) !!}
+							        <div class="form-group">
+							            {!! Form::submit('Delete!', array('class'=>'btn btn-danger btn-sm')) !!}
+							        </div>
+							    {!! Form::close() !!}
+							</div>
+							<div class="clear"></div>
+	                    </p>
+	                    
+	                    	@foreach($post->categories as $category)
+	                    		<p>
+	                    			{{{$category->name}}}
+	                    		</p>
+	                    	@endforeach
+	            	</div>
+            	</div>
+        	</div>
+        @endforeach
+        <div class="clear"></div>
 	  </div>
+	 
+
 
 </div>
 @stop

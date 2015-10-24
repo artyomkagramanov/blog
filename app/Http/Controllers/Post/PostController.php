@@ -67,7 +67,8 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        //
+        $post = $this->post->show($id);
+        return view('posts.show',['post'=>$post,'title' => $post->name]);
     }
 
     /**
@@ -78,7 +79,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        //
+        if(!$this->post->show($id))
+            return redirect('/post/')->with('status', 'Unknown error!');
+        $post = $this->post->show($id);
+        $category = $this->category->getAll();
+        return view('posts.form',['title'=>"Edit Post",'id'=>$id,'post' => $post,'categories'=>$category]);
     }
 
     /**
@@ -91,6 +96,14 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         //
+        if($this->post->update($request,$id))
+        {
+            return redirect('/post')->with('status', 'Post Edited');
+        }
+        else
+        {
+            return redirect('/post/')->with('status', 'Unknown error!');
+        }
     }
 
     /**
@@ -101,6 +114,13 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if($this->post->delete($id))
+        {
+            return redirect('/post')->with('status', 'Post Deleted');
+        }
+        else
+        {
+            return redirect('/post/'.$id)->with('status', 'Unknown error!');
+        }
     }
 }

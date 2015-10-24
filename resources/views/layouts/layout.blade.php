@@ -11,6 +11,30 @@
   <script src="{{ url('/js/jquery-1.11.3.js') }}"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="{{ url('/js/bootstrap.min.js') }}"></script>
+<style>
+    .thumbnail {
+        position: relative;
+        padding: 0px;
+        margin-bottom: 20px;
+    }
+
+        .thumbnail:hover {
+            background-color: #5CB85C;
+        }
+
+    .votes {
+        font-size: 47px;
+        color: #197BB5;
+        padding: 10px;
+    }
+
+    .thumbnail img {
+        width: 100%;
+    }
+    .clear{
+      clear:both;
+    }
+</style>
 
 
  </head>
