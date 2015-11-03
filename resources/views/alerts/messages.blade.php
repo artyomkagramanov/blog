@@ -9,6 +9,7 @@
 @endif
 @if( session('danger') )
 	<div class="alert alert-danger" style="text-align:center;">{{ session('danger') }}</div>
+
 @endif
 
 @if( $errors->has() )

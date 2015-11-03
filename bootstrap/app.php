@@ -42,11 +42,6 @@ $app->singleton(
 );
 
 $app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
-
-$app->singleton(
     App\Contracts\CategoryInterface::class,
     App\Services\CategoryService::class
 );
@@ -54,6 +49,7 @@ $app->singleton(
     App\Contracts\PostInterface::class,
     App\Services\PostService::class
 );
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application

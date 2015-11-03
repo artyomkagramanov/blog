@@ -1,4 +1,4 @@
-@extends('layouts/layout_auth')
+@extends('layouts/form')
 @section('title')
     Reset Password
 @stop

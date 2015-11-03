@@ -1,48 +1,68 @@
-@extends('layouts/layout')
+
+@extends('layouts.main')
+
 @section('title')
+
     {{$title}}
+
 @stop
+
+@section('header')
+
+    <div class="jumbotron" style="margin-bottom:0; padding-bottom:10px;">
+        <div class="container">
+            <h2 class="text-center"> 
+               {{$title}}
+            </h2>
+        </div>
+    </div>
+
+@stop
+
 @section('content')
-<div style="width:200px;margin:0 auto;">    
+
     @if(isset($post))
-    {!! Form::model($post,array('url' => '/post/'.$id, 'method' => 'PUT','files' => true)) !!}
+        {!! Form::model($post,array('url' => '/post/'.$id, 'method' => 'PUT', 'role' => 'form', 'style' => 'max-width:350px; padding:10px;', 'class' => 'center-block img-thumbnail' ,'files' => true)) !!}
     @else
-    {!! Form::open(array('url' => '/post/', 'method' => 'POST','files' => true)) !!}
+        {!! Form::open(array('url' => '/post/', 'method' => 'POST', 'role' => 'form', 'style' => 'max-width:350px; padding:10px;', 'class' => 'center-block img-thumbnail' , 'files' => true)) !!}
     @endif
-        <div class="form-group">
-            {!! Form::label('Title') !!}
-            {!! Form::text('title', null, array('required', 'class'=>'form-control', 'placeholder'=>'Enter  Title')) !!}
-        </div>
-        <div class="form-group">
-            {!! Form::label('Description') !!}
-            {!! Form::textarea('description', null, array('required', 'class'=>'form-control', 'placeholder'=>'Enter  Description')) !!}
-        </div>
-        <div class="form-group">
-            {!! Form::label('Select Image') !!}
-            {!! Form::file('post_image', null, array('required', 'class'=>'form-control')) !!}
-        </div>
-        <div class="form-group">
-            @if(isset($post))
-            
-                @foreach($categories as $category)
-                    {!! Form::label($category->name) !!}
-                    {!! Form::checkbox('category_'.$category->id, $category->id, in_array( $category->id , $post->categories->lists('id')->toArray())) !!}
-                @endforeach
-            
-            @else
+            <div class="form-group">
+                {!! Form::label('Title:') !!}
+                {!! Form::text('title', null, array('required', 'class'=>'form-control', 'placeholder'=>'Enter title', 'id' => 'title')) !!}
+            </div>
+             <div class="form-group">
+                {!! Form::label('Description:') !!}
+                {!! Form::textarea('description', null, array('required', 'class'=>'form-control', 'rows'=>'5', 'id' => 'description')) !!}
+            </div> 
+             <div class="form-group">
+                {!! Form::label('Choose Categories:') !!}
+                <div style="height:100px; overflow:scroll;">
+                    @if(isset($post))
+                        @foreach($categories as $category)
+                            <div class="checkbox">
+                                
+                                 <label>{!! Form::checkbox('category_'.$category->id, $category->id, in_array( $category->id , $post->categories->lists('id')->toArray())) !!} {{{$category->title}}}</label>
+                            </div>
+                        @endforeach
+                    @else
+                        @foreach($categories as $category)
+                            <div class="checkbox">
+                                
+                                <label>{!! Form::checkbox('category_'.$category->id, $category->id) !!} {{{$category->title}}}</label>
+                                <!-- <label><input type="checkbox" value="">Option 1</label> -->
+                            </div>                       
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+            <div class="form-group">
+                {!! Form::label('Choose Image:') !!}
+                {!! Form::file('image', null, array('id' => 'post_image')) !!}
+            </div> 
+            <div class="form-group text-center">
+                {!! Form::submit('Save!', array('class'=>'btn btn-default')) !!}
 
-                @foreach($categories as $category)
-                    {!! Form::label($category->name) !!}
-                    {!! Form::checkbox('category_'.$category->id, $category->id) !!}
-                @endforeach
-                
-            @endif
+            </div>
+        {!! Form::close() !!}
 
-        </div>
-        <div class="form-group">
-            {!! Form::submit('Save!', array('class'=>'btn btn-primary')) !!}
-        </div>
-    {!! Form::close() !!}
-</div>
-
-@endsection
+@stop

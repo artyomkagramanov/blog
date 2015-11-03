@@ -1,52 +1,58 @@
-@extends('layouts/layout')
+@extends('layouts.main')
+
 @section('title')
+
 	{{$title}}
+
 @stop
+
+@section('header')
+
+	@include('categories._header')
+
+@stop
+
 @section('content')
+    
+    @if(count($categories))
+    		<div class="row">
+	    @foreach($categories as $category)  
+				<div class="col-md-2" style="border-bottom:1px solid #EEEEEE;padding-bottom:10px;">
+					<h3 class="text-center">
+						{{{$category->title}}}
+					</h3>
+					<p class="text-center" style="font-family: Georgia, Times New Roman, Times, serif;">
+						{{{$category->updated_at}}} by 
+						@if(Auth::check() && Auth::user()->id === $category->user_id)
+							<a href="#">Me</a>
+						@else
+							<a href="#">{{{$category->user->name}}}</a>
+						@endif
 
-<div class="panel panel-default" style="max-width:350px;margin:0 auto;">
-	<div class="panel-heading">
-		{{$title}}
-		<a class="btn btn-default" href="{{url('/category/create')}}" role="button">Add New Category</a>
-	</div>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Name</th>
-				<th>Functions</th>
-			</tr>
-		</thead>
+					</p>
+					<p class="text-center">
+						<a class="btn btn-info btn-xs" href="{{url('/category/'.$category->id)}}" role="button">Posts »</a>
+						@if(Auth::check() && Auth::user()->id === $category->user_id)
+							<a class="btn btn-warning btn-xs" href="{{url('/category/'.$category->id.'/edit')}}" role="button">Edit »</a>
+						@endif
+					</p>
+				@if(Auth::check() && Auth::user()->id === $category->user_id)	
+					<div class="text-center" onclick="return confirm('Are you sure')">
+						{!! Form::open(array('url' => '/category/'.$category->id, 'method' => 'DELETE')) !!}
+							{!! Form::submit('Delete!', array('class'=>'btn btn-danger btn-xs')) !!}
+						{!! Form::close() !!}
+					</div>
+				@endif
+				</div>
+		@endforeach
+				</div>
+	@else
+		<h3 class="text-center">
+			Empty Records
+		</h3>
+	@endif
 
-		<tbody>
-			@if(count($categories))
-				@foreach($categories as $category)
-				<tr>
-					<th>{{$category->id}}</th>
-					<td>
-						<a   href="{{url('/category/'.$category->id)}}">{{$category->name}}</a>
-					</td>
-					<td>
-						<a style="display:block; float:left; margin-right:7px;" class='btn btn-primary btn-sm' href="{{url('/category/'.$category->id.'/edit')}}">Edit</a>
-						<div onclick="return confirm('Are you sure')" style="display:block; float:left;">						
-						    {!! Form::open(array('url' => '/category/'.$category->id, 'method' => 'DELETE')) !!}
-						        <div class="form-group">
-						            {!! Form::submit('Delete!', array('class'=>'btn btn-danger btn-sm')) !!}
-						        </div>
-						    {!! Form::close() !!}
-						</div>
-					</td>		
-				</tr>
 
-				@endforeach
-			@else
-				<tr>
-					<td><h2 align="center">Empty!</h2></td>
-				</tr>
-			@endif	
 
-		</tbody>
-	</table>
-	
-</div>
+
 @stop

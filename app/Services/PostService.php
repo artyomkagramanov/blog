@@ -2,124 +2,95 @@
 namespace App\Services;
 use App\Contracts\PostInterface;
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Contracts\Auth\Guard;
 
 class PostService implements PostInterface
 {
-	protected $post;
-	protected $user;
 
-	public function __construct(Post $post,Guard $auth){
+	public function __construct(Post $post,Category $category,Guard $auth)
+	{
 		$this->post = $post;
+		$this->category = $category;
 		$this->user = $auth;
 	}
 
 	public function getAll()
 	{
+		return $this->post->with('categories')->get();
+	}
+
+	public function getUsersPosts()
+	{	
 		return $this->post->where('user_id', $this->user->id())->get();
 	}
 
 	public function show($id)
 	{
-		return $this->post->find($id);
+		return $this->post->with('categories')->find($id);
 	}
+
 
 	public function delete($id)
 	{
 		$this->post->find($id)->categories()->detach();
+		$image_name = $this->post->find($id)->image;
 
-		return $this->post
-			->where('id', '=', $id)
-			->where('user_id',$this->user->id())
-			->delete();
+		if($this->post->where('id',$id)->delete($id))
+		{
+			return $image_name;
+		}
+		return false;
+
 	}
 
-	public function update($request,$id)
+
+	public function update($fields,$id)
 	{
-
-		$image = $this->post->find($id)->image;
-		$data = $request->all();
-		if( $request->hasFile('post_image') )
-		{
-        	$file = $request->file('post_image');
-        	unlink(realpath('images').'\\'.$image);
-        	$image = time().$file->getClientOriginalName();
-        	//dd(realpath('images'));
-        	
-        	//File::delete('/images/'.$image);
-        	$file->move('images',$image);
-        }
-
-        $inputs = $this->secureData($data);
-        $inputs['image'] = $image;
+        $inputs = $this->getinputs($fields);
         $result = $this->post
 			->where('id', $id)
-			->where('user_id',$this->user->id())
             ->update($inputs);
         if($result)
         {	
         	$ids = array();
-			foreach ($data as $key => $value) 
-			{
-				if(strpos($key,'category_') !== false)
-				{
-					$ids[] = $value;
-				}
-			}
-        	$post=$this->post->find($id);
-        	$post->categories()->detach();
-        	$post->categories()->attach($ids);
+			$ids = isset($fields['categories_ids'])?$fields['categories_ids']:[];
+			if(count($ids)){
+	        	$post=$this->post->find($id);
+	        	$post->categories()->detach();
+	        	$post->categories()->attach($ids);
+	        }
         	return $result;
         }
-        else return $result;
+        else return false;
 	}
 
-	public function create($request)
+	public function create($fields)
 	{	
-		$image="default.jpg";
-		$data = $request->all();
-
-
-		
-		if( $request->hasFile('post_image') )
-		{
-        	$file = $request->file('post_image');
-        	$image = time().$file->getClientOriginalName();
-        	$file->move('images',$image);
-        }
-
-        $inputs = $this->secureData($data);
-        $inputs['image'] = $image;
-        $id=$this->post
+        $inputs = $this->getInputs($fields);
+        
+        $id = $this->post
 			->insertGetId($inputs);
-		if($id)
-		{
+		
+		if($id){
 			// if ok do this block and return last inserted id
-			$ids = array();
-			foreach ($data as $key => $value) 
-			{
-				if(strpos($key,'category_') !== false)
-				{
-					$ids[] = $value;
-				}
+        	$ids = array();
+			$ids = isset($fields['categories_ids'])?$fields['categories_ids']:[];
+			if(count($ids)){
+				$this->post 	//attach ralation to category
+				->find($id)
+				->categories()
+				->attach($ids);	
 			}
-			//dd($ids);
-			$this->post->find($id)->categories()->attach($ids);
-			return $id;	
-		}
-		else
-		{
-			// if bad return NULL
-			return $id;
-		}
-			
 
+			return $id;	
+		} else return false;		
 	}
 
-	private function secureData($data)
+	private function getinputs($data)
 	{
-		$data2=array('title' => $data['title'],'user_id'=>$this->user->id(),"description" => $data['description']  );
-		return $data2;
+		$inputs = array('title' => $data['title'],'user_id' =>1 ,'description' => $data['description'], 'image' => $data['image']  );
+		return $inputs;
 	}
 } 
 

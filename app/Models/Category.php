@@ -6,11 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-	 protected $fillable = array('name','user_id');
-    //
+     protected $fillable = array('title','user_id');
+    
 
-	 public function posts()
+	public function posts()
     {
-        return $this->belongsToMany('App\Models\Post','categoriestoposts');
+        return $this->belongsToMany('App\Models\Post','post_category');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
     }
 }

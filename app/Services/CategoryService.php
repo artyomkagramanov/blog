@@ -3,6 +3,7 @@ namespace App\Services;
 use App\Contracts\CategoryInterface;
 use App\Models\Category;
 use Illuminate\Contracts\Auth\Guard;
+use Carbon\Carbon ;
 
 
 class CategoryService implements CategoryInterface
@@ -17,11 +18,16 @@ class CategoryService implements CategoryInterface
 
 	public function getAll()
 	{
+		return $this->category->get();
+	}
+
+	public function getUsersCategories()
+	{
 		return $this->category->where('user_id', $this->user->id())->get();
 	}
 
 	public function show($id)
-	{
+	{	
 		return $this->category->find($id);
 	}
 
@@ -30,28 +36,28 @@ class CategoryService implements CategoryInterface
 		$this->category->find($id)->posts()->detach();
 		 return $this->category
 			->where('id', '=', $id)
-			->where('user_id',$this->user->id())
 			->delete();
 	}
 
-	public function update($inputs,$id)
+	public function update($fields,$id)
 	{
+		$inputs = $this->getInputs($fields);
 		return $this->category
 			->where('id', $id)
-			->where('user_id',$this->user->id())
-            ->update($this->secureData($inputs));
+            ->update($inputs);
 	}
 
-	public function create($inputs)
+	public function create($fields)
 	{	
 		
 		return $this->category
-			->insert($this->secureData($inputs));
+			->create($this->getInputs($fields));
 	}
 
-	private function secureData($data){
-		$data2=array('name' => $data['name'],'user_id'=>$this->user->id() );
-		return $data2;
+	private function getInputs($data)
+	{
+		$inputs=array('title' => $data['title'],'user_id' => 1 );
+		return $inputs;
 	}
 
 

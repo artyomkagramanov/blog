@@ -7,28 +7,27 @@ use App\Http\Requests;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Controllers\Controller;
 use App\Contracts\CategoryInterface;
-
-
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
-    protected $category;
     
 
-    public function __construct(CategoryInterface $category)
+    public function __construct()
     {
-        $this->category = $category;
-       
+    
+       // $this->middleware('auth',[ 'except' => ['index','show'] ]);  
+
     }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-
-        return view('categories.index',['categories'=>$this->category->getAll(),'title' => 'Categories']);
+    public function index(CategoryInterface $category_service)
+    {   
+        return response()->json($category_service->getAll() );
+        //return view('categories.index',['categories'=>$category_service->getAll(),'title' => 'Categories']);
     }
 
     /**
@@ -38,8 +37,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        
+        return view('categories.form',['title' => "Add New Category"]);
 
-         return view('categories.form',['title'=>"Create Category"]);
     }
 
     /**
@@ -48,17 +48,18 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CategoryRequest $request)
+    public function store(CategoryRequest $request,CategoryInterface $category_service)
     {
-        //
-
-        if($this->category->create($request->all()))
+        
+        if($category_service->create($request->all()))
         {
-            return redirect('/category')->with('status', 'Category Added');
+            return response()->json(true);
+            //return redirect('/category')->with('status', 'Category Added');
         }
         else
         {
-            return redirect('/category/')->with('status', 'Unknown error!');
+            return response()->json(false);
+            //return redirect('/category')->with('warning', 'Category Added');
         }
 
     }
@@ -69,11 +70,16 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,CategoryInterface $category_service)
     {
-        //
-        $category = $this->category->show($id);
-        return view('categories.show',['category'=>$category,'title' => $category->name]);
+        /*$category = $this->category->show($id);
+        return view('posts.index',['posts'=>$category->posts,'title' => $category->title]);*/
+        return response()->json( $category_service->show($id));
+    }
+
+    public function user(CategoryInterface $category_service)
+    {
+        return view('categories.index',['categories'=>$category_service->getUsersCategories(true),'title' => 'My categories']);
     }
 
     /**
@@ -82,11 +88,11 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {   
-
-        $category = $this->category->show($id);
-        return view('categories.form',['title'=>"Edit Category",'id'=>$id,'category' => $category]);
+    public function edit($id,CategoryInterface $category_service)
+    {
+        
+        $category = $category_service->show($id);
+        return view('categories.form',['title'=>"Edit Category",'id' => $id,'category' => $category]);
     }
 
     /**
@@ -96,16 +102,18 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(CategoryRequest $request, $id)
-    {
-        //
-        if($this->category->update($request->all(),$id))
+    public function update(CategoryRequest $request, $id,CategoryInterface $category_service)
+    {   
+        
+        if($category_service->update($request->all(),$id))
         {
-            return redirect('/category')->with('status', 'Category Edited');
+            /*return redirect('/category')->with('status', 'Category Edited');*/
+            return response()->json(true);
         }
         else
         {
-            return redirect('/category/')->with('status', 'Unknown error!');
+            /*return redirect('/category/')->with('warning', 'Unknown error!');*/
+            return response()->json(false);
         }
     }
 
@@ -115,15 +123,18 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        if($this->category->delete($id))
+    public function destroy($id,CategoryInterface $category_service)
+    {   
+        
+        if($category_service->delete($id))
         {
-            return redirect('/category')->with('status', 'Category Deleted');
+            /*return redirect('/category')->with('status', 'Category Deleted');*/
+            return response()->json(true);
         }
         else
         {
-            return redirect('/category/'.$id)->with('status', 'Unknown error!');
+            /*return redirect('/category/'.$id)->with('warning', 'Unknown error!');*/
+            return response()->json(false);
         }
     }
 }

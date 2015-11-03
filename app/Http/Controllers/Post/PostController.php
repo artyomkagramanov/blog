@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Post;
-
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Http\Requests\PostRequest;
 use App\Http\Controllers\Controller;
 use App\Contracts\PostInterface;
 use App\Contracts\CategoryInterface;
@@ -15,77 +14,69 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    protected $post;
-    protected $category;
 
-    public function __construct(PostInterface $post,CategoryInterface $category)
+    public function __construct()
     {
-        $this->post=$post;
-        $this->category=$category;
-    }
 
-    public function index()
+    }
+    public function index(PostInterface $post_service)
     {
-        return view('posts.index',['posts'=>$this->post->getAll(),'title' => 'Posts']);
+        return response()->json($post_service->getAll());
+        /*return view('posts.index',['posts' => $post_service->getAll(),'title' => 'Posts']);*/
     }
-
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CategoryInterface $category_service)
     {
-        return view('posts.form',['title' => 'Create New Post','categories' => $this->category->getAll()]);
+        return view('posts.form',['title' => 'Create New Post','categories' => $category_service->getAll()]);
     }
-
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,PostInterface $post_service)
     {
-        //
-        //dd($request->file('post_image'));
-        if($this->post->create($request))
-        {
-            return redirect('/post')->with('status', 'Post Added');
+        
+        if($post_service->create($request->all())){
+            return response()->json( true);
+            /*return redirect('/post')->with('status', 'Post Added');*/
+        }else{   
+            return response()->json(false);
+            /*return redirect('/post/')->with('status', 'Unknown error!');*/
         }
-        else
-        {
-            return redirect('/post/')->with('status', 'Unknown error!');
-        }
-    }
 
+    }
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,PostInterface $post_service)
     {
-        $post = $this->post->show($id);
-        return view('posts.show',['post'=>$post,'title' => $post->name]);
+        $post = $post_service->show($id);
+        return response()->json( $post_service->show($id));
+        /*return view('posts.show',['post'=>$post,'title' => $post->name]);*/
     }
-
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id,PostInterface $post_service,CategoryInterface $category_service)
     {
-        if(!$this->post->show($id))
+        if(!$post_service->show($id))
             return redirect('/post/')->with('status', 'Unknown error!');
-        $post = $this->post->show($id);
-        $category = $this->category->getAll();
-        return view('posts.form',['title'=>"Edit Post",'id'=>$id,'post' => $post,'categories'=>$category]);
+        $post = $post_service->show($id);
+        $categories = $category_service->getAll();
+        return view('posts.form',['title'=>"Edit Post",'id'=>$id,'post' => $post,'categories'=>$categories]);
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -93,34 +84,36 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id,PostInterface $post_service)
     {
         //
-        if($this->post->update($request,$id))
+        if($post_service->update($request->all(),$id))
         {
-            return redirect('/post')->with('status', 'Post Edited');
+            return response()->json(true);
+            //return redirect('/post')->with('status', 'Post Edited');
         }
         else
         {
-            return redirect('/post/')->with('status', 'Unknown error!');
+            return response()->json(false);
+            //return redirect('/post/')->with('status', 'Unknown error!');
         }
     }
-
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,PostInterface $post_service)
     {
-        if($this->post->delete($id))
-        {
-            return redirect('/post')->with('status', 'Post Deleted');
-        }
-        else
-        {
-            return redirect('/post/'.$id)->with('status', 'Unknown error!');
+        $image_name = $post_service->delete($id);
+        
+        if($image_name){
+            /*return redirect('/category')->with('status', 'Category Deleted');*/
+            return response()->json( $image_name);
+        } else{
+            /*return redirect('/category/'.$id)->with('warning', 'Unknown error!');*/
+            return response()->json(NULL);
         }
     }
 }
