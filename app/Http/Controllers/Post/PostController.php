@@ -29,6 +29,13 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function getPostsByCategoriesIds($ids,PostInterface $post_service)
+    {
+        $posts = $post_service->getPostsByCategoriesIds($ids);
+        //dd($posts);
+        return response()->json($posts);
+    }
+
     public function create(CategoryInterface $category_service)
     {
         return view('posts.form',['title' => 'Create New Post','categories' => $category_service->getAll()]);

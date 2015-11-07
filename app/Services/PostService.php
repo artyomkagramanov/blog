@@ -44,6 +44,22 @@ class PostService implements PostInterface
 
 	}
 
+	public function getPostsByCategoriesIds($ids)
+	{
+		$ids_arr = explode(',', $ids);
+		$categories_posts = array();
+		foreach ($ids_arr as  $id) {
+			$categories_posts[] = $this->category->find($id)->posts->toArray();
+		}
+		$posts=array();
+		foreach ($categories_posts as  $category_post) {
+			foreach ($category_post as $post) {
+				$posts[] = $post;
+			}
+		}
+		return $posts;
+	}
+
 
 	public function update($fields,$id)
 	{
